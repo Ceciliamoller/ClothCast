@@ -8,25 +8,47 @@ from main import get_weather_data, estimate_uv_index
 # Get coordinates from city name
 # ----------------------------
 def get_coordinates_from_city(city_name):
-    geolocator = Nominatim(user_agent="clothcast")
-    location = geolocator.geocode(city_name)
-    if location:
-        return location.latitude, location.longitude
-    else:
+    geolocator = Nominatim(user_agent="clothcast", timeout=10)
+    try:
+        location = geolocator.geocode(city_name)
+        if location:
+            return location.latitude, location.longitude
+        else:
+            return None, None
+    except Exception as e:
+        st.error("Could'nt reach the location service (OpenStreetMap). Try again later.")
         return None, None
 
 # ----------------------------
-# Streamlit UI
+# font and background
 # ----------------------------
-st.set_page_config(page_title="Clothcast", page_icon="🧥")
+
 st.markdown("""
     <style>
-    html, body, [class*="css"]  {
-        font-family: "Figtree", sans-serif;
+    @font-face {
+        font-family: 'Rubik';
+        src: url('https://raw.githubusercontent.com/Ceciliamoller/ClothCast/main/rubik.woff2') format('woff2');
+        font-weight: 400;
+    }
+
+    * {
+        font-family: 'Rubik', sans-serif !important;
+    }
+
+    html, body, .stApp, .css-18ni7ap, .css-1d391kg, .css-1cpxqw2, .css-ffhzg2, .css-1v0mbdj, .css-1offfwp {
+        font-family: 'Rubik', sans-serif !important;
         font-size: 16px;
     }
+
     </style>
 """, unsafe_allow_html=True)
+
+
+
+
+
+
+
 
 st.title("Clothcast")
 
@@ -36,7 +58,7 @@ if city_input:
     lat, lon = get_coordinates_from_city(city_input)
 
     if lat and lon:
-        st.markdown(f" **Location**: {city_input} **Coordinates:** {lat:.2f}, {lon:.2f}")
+        st.markdown(f" **Location**: {city_input}")
 
         try:
             data = get_weather_data(lat, lon)
@@ -50,8 +72,8 @@ if city_input:
             uv = estimate_uv_index(cloudiness)
 
             # Show weather data
-            st.markdown("### Today's weather:")
-            st.markdown(f"Tempe: **{temp}°C**")
+            st.markdown("### Weather today:")
+            st.markdown(f"Temp: **{temp}°C**")
             st.markdown(f"Wind: **{wind} m/s**")
             st.markdown(f"Rain or things: **{precip} mm**")
             st.markdown(f"Clouds: **{cloudiness}%**")
