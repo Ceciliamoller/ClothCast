@@ -1,7 +1,7 @@
 
 # 🧥 Clothcast
 
-Clothcast is a small weather-based clothing assistant.  
+Clothcast is a small weather-based clothing recommender.  
 You enter a city and get a suggestion for what to wear based on the current weather there.  
 
 It is built using real-time weather data from the Norwegian Meteorological Institute (MET) and coordinates from OpenStreetMap.  
