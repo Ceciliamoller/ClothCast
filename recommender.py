@@ -46,11 +46,12 @@ def estimate_feels_like_temp(temp, wind, cloudiness, now=None, sunset_time=None)
     return adjusted_temp
 
 
+
 def is_daytime(current_hour):
     """Determine if it is daytime (6AM to 7PM)."""
     return 6 <= current_hour <= 19
 
-def get_clothing_recommendation(temp, wind, precip, uv, cloudiness, upcoming_precip=[], upcoming_temps=[], now=None, sunset_time=None):
+def get_clothing_recommendation(temp, wind, precip, cloudiness, upcoming_precip=[], upcoming_temps=[], now=None, sunset_time=None):
     tips = []
 
     # --- Adjust temp for wind and clouds ---
@@ -85,12 +86,6 @@ def get_clothing_recommendation(temp, wind, precip, uv, cloudiness, upcoming_pre
     # --- Precipitation ---
     if precip > 0.5:
         tips.append("Rain expected! Bring an umbrella or raincoat.")
-
-    # --- UV index ---
-    if uv >= 5 and now and sunset_time:
-        time_to_sunset = (sunset_time - now).total_seconds() / 3600
-        if time_to_sunset > 0:  # It's still before sunset
-            tips.append("High UV! Use sunscreen and sunglasses.")
 
     
     # --- Future weather (upcoming 6h) ---

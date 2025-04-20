@@ -3,7 +3,7 @@ import requests
 from datetime import datetime, timezone
 from geopy.geocoders import Nominatim
 from recommender import get_clothing_recommendation
-from main import get_weather_data, estimate_uv_index, get_sunset_time
+from main import get_weather_data, get_sunset_time
 
 
 # ----------------------------
@@ -71,7 +71,6 @@ if city_input:
             wind = current["data"]["instant"]["details"]["wind_speed"]
             cloudiness = current["data"]["instant"]["details"].get("cloud_area_fraction", 50)
             precip = current["data"].get("next_1_hours", {}).get("details", {}).get("precipitation_amount", 0)
-            uv = estimate_uv_index(cloudiness)
 
             # Show weather data
             st.markdown("### Weather today:")
@@ -79,7 +78,6 @@ if city_input:
             st.markdown(f"Wind: **{wind} m/s**")
             st.markdown(f"Rain or things: **{precip} mm**")
             st.markdown(f"Clouds: **{cloudiness}%**")
-            st.markdown(f"Estimated UV: **{uv}**")
 
             # --- Look ahead at next 6 hours ---
             upcoming_temps = []
@@ -97,7 +95,7 @@ if city_input:
 
 
             # --- Pass to recommender ---
-            tips = get_clothing_recommendation(temp, wind, precip, uv, cloudiness, upcoming_precip, upcoming_temps, now=now, sunset_time=sunset_time)
+            tips = get_clothing_recommendation(temp, wind, precip, cloudiness, upcoming_precip, upcoming_temps, now=now, sunset_time=sunset_time)
 
             st.markdown("### Recommended clothing:")
             for tip in tips:
