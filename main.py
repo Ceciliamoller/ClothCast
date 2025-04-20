@@ -18,13 +18,41 @@ def estimate_uv_index(cloudiness):
         return 4
     else:
         return 2
+    
+
+    import requests
+from datetime import datetime, timezone
+
+
+# ----------------------------
+# Function: Fetch sunset data from MET API
+# ----------------------------
+def get_sunset_time(lat, lon):
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    url = f"https://api.sunrise-sunset.org/json?lat={lat}&lng={lon}&formatted=0"
+
+    headers = {
+        "User-Agent": "ClothCast/1.0"  # Met.no requires User-Agent!
+    }
+
+    response = requests.get(url)
+    data = response.json()
+
+    # Navigate to the sunset time
+    sunset_str = data["results"]["sunset"]
+
+    # Convert to datetime object
+    sunset_time = datetime.fromisoformat(sunset_str)
+
+    return sunset_time
+
 
 # ----------------------------
 # Function: Fetch weather data from MET API
 # ----------------------------
 def get_weather_data(lat, lon):
     headers = {
-        "User-Agent": "clothcast/1.0 your-email@example.com"
+        "User-Agent": "clothcast/1.0 ceciliamollerblom@gmail.com"
     }
     url = f"https://api.met.no/weatherapi/locationforecast/2.0/compact?lat={lat}&lon={lon}"
     response = requests.get(url, headers=headers)
