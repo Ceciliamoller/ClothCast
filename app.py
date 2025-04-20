@@ -1,8 +1,10 @@
 import streamlit as st
 import requests
+from datetime import datetime, timezone
 from geopy.geocoders import Nominatim
 from recommender import get_clothing_recommendation
-from main import get_weather_data, estimate_uv_index
+from main import get_weather_data, estimate_uv_index, get_sunset_time
+
 
 # ----------------------------
 # Get coordinates from city name
@@ -79,11 +81,28 @@ if city_input:
             st.markdown(f"Clouds: **{cloudiness}%**")
             st.markdown(f"Estimated UV: **{uv}**")
 
-            # Show recommendations
+            # --- Look ahead at next 6 hours ---
+            upcoming_temps = []
+            upcoming_precip = []
+
+            for hour_data in data["properties"]["timeseries"][1:7]:
+                upcoming_details = hour_data["data"]["instant"]["details"]
+                upcoming_temps.append(upcoming_details.get("air_temperature", temp))  # fallback to current temp
+                upcoming_precip.append(hour_data["data"].get("next_1_hours", {}).get("details", {}).get("precipitation_amount", 0))
+
+
+            # get current time and sunset time
+            sunset_time = get_sunset_time(lat, lon)
+            now = datetime.now(timezone.utc)
+
+
+            # --- Pass to recommender ---
+            tips = get_clothing_recommendation(temp, wind, precip, uv, cloudiness, upcoming_precip, upcoming_temps, now=now, sunset_time=sunset_time)
+
             st.markdown("### Recommended clothing:")
-            tips = get_clothing_recommendation(temp, wind, precip, uv, cloudiness)
             for tip in tips:
-                st.write(tip)
+                st.write(f"- {tip}")
+            
 
         except Exception as e:
             st.error("An error occurred while fetching the weather data.")
